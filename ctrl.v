@@ -58,7 +58,7 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
       start1:
 	  if (rst_f == 1'b0) 
         next_state = start1;
-	 else
+	  else
          next_state = fetch;
       fetch:
         next_state = decode;
@@ -80,6 +80,8 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
 
   /* TODO: Generate combinational signals based on the FSM states and inputs. For Parts 2, 3 and 4 you will
        add the new control signals here. */
+
+
 
   end
 
