@@ -10,3 +10,6 @@ module mux32 (in_a, in_b, sel, out);
 
 STATE REGISTER
 module statreg (clk, in, enable, out);
+
+CTRL
+module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
