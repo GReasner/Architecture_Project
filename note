@@ -11,5 +11,11 @@ module mux32 (in_a, in_b, sel, out);
 STATE REGISTER
 module statreg (clk, in, enable, out);
 
+^^ GIVEN/IMMUTABLE ^^
+
 CTRL
 module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
+(finish generating control lines)
+
+SISC
+(instantiate all 5 modules above and connect all control and date signals)
