@@ -10,11 +10,11 @@ module sisc (clk, rst_f, ir);
 
 // declare all internal wires here
 // instruction fields
-wire [31:28] alu_opcode;
-wire [27:24] mm;
-wire [19:16] regA;
-wire [15:12] regB;
-wire [23:20] write_reg;
+wire [3:0] opcode;
+wire [3:0] mm;
+wire [3:0] regA;
+wire [3:0] regB;
+wire [3:0] write_reg;
 wire [15:0] imm;
 
 // RF outputs
@@ -37,6 +37,16 @@ wire [3:0] stat_out
 //MUX output
 wire [15:0] mux_out
 
+
+//assign instructions
+assign opcode = ir[31:28];
+assign mm = ir[27:24];
+
+assign write_reg = ir[23:20];
+assign regA = ir[19:16];
+assign regB = ir[15:12];
+
+assign imm = ir[15:0];
 
 // component instantiation goes here
 
