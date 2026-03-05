@@ -21,7 +21,7 @@ wire [15:0] imm;
 wire [31:0] rsa;
 wire [31:0] rsb;
 
-//ALU controls
+//controls
 wire rf_we;
 wire wb_sel; 
 wire [3:0] alu_op;
@@ -32,10 +32,10 @@ wire [3:0] stat;
 wire [31:0] alu_result;
 
 //stat output
-wire [3:0] stat_out
+wire [3:0] stat_out;
 
 //MUX output
-wire [15:0] mux_out
+wire [31:0] mux_out;
 
 
 //assign instructions
@@ -49,7 +49,15 @@ assign regB = ir[15:12];
 assign imm = ir[15:0];
 
 // component instantiation goes here
+ctrl CTRL (clk, rst_f, opcode, mm, stat_out, rf_we, alu_op, wb_sel);
 
+rf RF (clk, regA, regB, write_reg, mux_out, rf_we, rsa, rsb);
+
+alu ALU (clk, rsa, rsb, imm, stat_out[3], alu_op, mm, alu_result, stat, stat_en);
+
+statreg STATEREG (clk, stat, stat_en, stat_out);
+
+mux32 MUX (alu_result, 32'b0, wb_sel, mux_out);
 
 
   initial
