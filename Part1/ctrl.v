@@ -5,11 +5,9 @@
 
 module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
 
-  /* 
-    Declare the ports listed above as inputs or outputs.  Note that this is
+  /* Declare the ports listed above as inputs or outputs.  Note that this is
      only the signals for part 1.  You will be adding signals for parts 2,
-     2, and 4. 
-  */
+     2, and 4. */
   
   input clk, rst_f;
   input [3:0] opcode, mm, stat;
@@ -77,7 +75,7 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
     endcase
   end
 
-  always @*
+  always @(present_state, opcode)
   begin
 
   /* TODO: Generate combinational signals based on the FSM states and inputs. For Parts 2, 3 and 4 you will
@@ -88,7 +86,8 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
     alu_op = 4'b0000; // base case NOP
 
     case (present_state)
-      execute, mem: begin
+
+      execute: begin
         if (opcode == REG_OP)
           alu_op = 4'b0001;   // register operation
         else if (opcode == REG_IM)
@@ -97,8 +96,9 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
 
       writeback: begin
         if (opcode == REG_OP || opcode == REG_IM)
-          rf_we = 1'b1;       // enable register writeback
+          rf_we = 1'b1; // enable writeback
       end
+
     endcase
   end
 
