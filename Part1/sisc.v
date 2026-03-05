@@ -35,7 +35,7 @@ wire [31:0] alu_result;
 wire [3:0] stat_out;
 
 //MUX output
-wire [31:0] mux_out;
+wire [31:0] write_data; //mux out
 
 
 //assign instructions
@@ -51,20 +51,26 @@ assign imm = ir[15:0];
 // component instantiation goes here
 ctrl CTRL (clk, rst_f, opcode, mm, stat_out, rf_we, alu_op, wb_sel);
 
-rf RF (clk, regA, regB, write_reg, mux_out, rf_we, rsa, rsb);
+rf RF (clk, regA, regB, write_reg, write_data, rf_we, rsa, rsb);
 
 alu ALU (clk, rsa, rsb, imm, stat_out[3], alu_op, mm, alu_result, stat, stat_en);
 
-statreg STATEREG (clk, stat, stat_en, stat_out);
+statreg STATREG (clk, stat, stat_en, stat_out);
 
-mux32 MUX (alu_result, 32'b0, wb_sel, mux_out);
-
-
-  initial
-  
-// put a $monitor statement here.  
+mux32 MUX (alu_result, 32'b0, wb_sel, write_data);
 
 
+initial
+  $monitor("IR=%h R1=%h R2=%h R3=%h R4=%h R5=%h ALU_OP=%b WB_SEL=%b RF_WE=%b",
+            ir,
+            RF.ram_array[1],
+            RF.ram_array[2],
+            RF.ram_array[3],
+            RF.ram_array[4],
+            RF.ram_array[5],
+            alu_op,
+            wb_sel,
+            rf_we);
 
 endmodule
 
