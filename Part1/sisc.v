@@ -60,17 +60,27 @@ statreg STATREG (clk, stat, stat_en, stat_out);
 mux32 MUX (alu_result, 32'b0, wb_sel, write_data);
 
 
-initial
-  $monitor("IR=%h R1=%h R2=%h R3=%h R4=%h R5=%h ALU_OP=%b WB_SEL=%b RF_WE=%b",
-            ir,
-            RF.ram_array[1],
-            RF.ram_array[2],
-            RF.ram_array[3],
-            RF.ram_array[4],
-            RF.ram_array[5],
-            alu_op,
-            wb_sel,
-            rf_we);
+initial begin
+  $display(" time |    ir    | op mm wd a  b  |    r1    |    r2    |    r3    |    r4    |    r5    |  alu_out | stat | alu wb we");
+  $monitor("%5t | %08h | %1h  %1h  %1h  %1h  %1h | %08h | %08h | %08h | %08h | %08h | %08h | %04b | %03b  %1b  %1b",
+           $time,
+           ir,
+           opcode,
+           mm,
+           write_reg,
+           regA,
+           regB,
+           RF.ram_array[1],
+           RF.ram_array[2],
+           RF.ram_array[3],
+           RF.ram_array[4],
+           RF.ram_array[5],
+           alu_result,
+           stat_out,
+           alu_op,
+           wb_sel,
+           rf_we);
+end
 
 endmodule
 
