@@ -3,16 +3,30 @@
 
 `timescale 1ns/100ps
 
-module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
+module ctrl (
+    clk, rst_f, opcode, mm, stat,
+    rf_we, alu_op, wb_sel,
+    br_sel, pc_rst, pc_write, pc_sel, ir_load
+);
 
   /* Declare the ports listed above as inputs or outputs.  Note that this is
      only the signals for part 1.  You will be adding signals for parts 2,
      2, and 4. */
   
   input clk, rst_f;
-  input [3:0] opcode, mm, stat;
-  output reg rf_we, wb_sel;
+  input [3:0] opcode;
+  input [3:0] mm;
+  input [3:0] stat;
+
+  output reg rf_we;
   output reg [3:0] alu_op;
+  output reg wb_sel;
+
+  output reg br_sel;
+  output reg pc_rst;
+  output reg pc_write;
+  output reg pc_sel;
+  output reg ir_load;
   
   // state parameter declarations
   
@@ -75,33 +89,87 @@ module ctrl (clk, rst_f, opcode, mm, stat, rf_we, alu_op, wb_sel);
     endcase
   end
 
-  always @(present_state, opcode)
+  always @(*)
   begin
 
   /* TODO: Generate combinational signals based on the FSM states and inputs. For Parts 2, 3 and 4 you will
        add the new control signals here. */
 
-    
-  rf_we  = 1'b0; 
-  wb_sel = 1'b0;
-  alu_op = 4'b0000; // default
+    rf_we    = 1'b0; 
+    wb_sel   = 1'b0;
+    alu_op   = 4'b0000;
 
-  case (present_state)
+    br_sel   = 1'b0;
+    pc_rst   = 1'b0;
+    pc_write = 1'b0;
+    pc_sel   = 1'b0;
+    ir_load  = 1'b0;
 
-    execute,
-    mem,
-    writeback: begin
-      if (opcode == REG_OP)
-        alu_op = 4'b0001;   // register operation
-      else if (opcode == REG_IM)
-        alu_op = 4'b0011;   // immediate operation
+    case (present_state)
+
+      start0,
+      start1: begin
+        pc_rst = 1'b1;
+      end
+
+      fetch: begin
+        ir_load  = 1'b1;
+        pc_write = 1'b1;
+        pc_sel   = 1'b0;
+      end
+
+      decode: begin
+        case (opcode)
+
+        // Absolute unconditional
+        BRA, JPA, CALL: begin
+          br_sel   = 1'b1;
+          pc_sel   = 1'b1;
+          pc_write = 1'b1;
+        end
+
+        // Relative unconditional
+        BRR, JPR, RET: begin
+          br_sel   = 1'b0;
+          pc_sel   = 1'b1;
+          pc_write = 1'b1;
+        end
+
+        // Absolute conditional (NOT ZERO)
+        BNE: begin
+          br_sel = 1'b1;
+          if (stat[0] == 1'b0) begin
+            pc_sel   = 1'b1;
+            pc_write = 1'b1;
+          end
+        end
+
+        // Relative conditional (NOT ZERO)
+        BNR: begin
+          br_sel = 1'b0;
+          if (stat[0] == 1'b0) begin
+            pc_sel   = 1'b1;
+            pc_write = 1'b1;
+          end
+        end
+
+      endcase
     end
-  endcase
-    
-  if (present_state == writeback)
-    if (opcode == REG_OP || opcode == REG_IM) 
-      rf_we = 1'b1; // enable writeback
-    
+
+      execute,
+      mem,
+      writeback: begin
+        if (opcode == REG_OP)
+          alu_op = 4'b0001;
+        else if (opcode == REG_IM)
+          alu_op = 4'b0011;
+      end
+    endcase
+
+    if (present_state == writeback) begin
+      if (opcode == REG_OP || opcode == REG_IM)
+        rf_we = 1'b1;
+    end
   end
 
 // Halt on HLT instruction

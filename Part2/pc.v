@@ -44,12 +44,12 @@ module pc (clk, br_addr, pc_sel, pc_write, pc_rst, pc_out);
         pc_out <= pc_in;
   end
   
-  always @(br_addr, pc_inc, pc_sel)
+  always @(*)
   begin
     if (pc_sel == 1'b0)
-      pc_in <= pc_out + 1;
+      pc_in = pc_out + 1;
     else
-      pc_in <= br_addr;
+      pc_in = br_addr;
   end
 
 endmodule
