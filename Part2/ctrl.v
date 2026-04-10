@@ -121,40 +121,51 @@ module ctrl (
       decode: begin
         case (opcode)
 
-        // Absolute unconditional
-        BRA, JPA, CALL: begin
-          br_sel   = 1'b1;
-          pc_sel   = 1'b1;
-          pc_write = 1'b1;
-        end
+          // =========================
+          // BRA / BRR (normal condition)
+          // =========================
+          BRA, BRR: begin
+            if (opcode == BRA)
+              br_sel = 1'b1;
+            else
+              br_sel = 1'b0;
 
-        // Relative unconditional
-        BRR, JPR, RET: begin
-          br_sel   = 1'b0;
-          pc_sel   = 1'b1;
-          pc_write = 1'b1;
-        end
+            if ((mm & stat) != 4'b0000) begin
+              pc_sel   = 1'b1;
+              pc_write = 1'b1;
+            end
+          end
 
-        // Absolute conditional (NOT ZERO)
-        BNE: begin
-          br_sel = 1'b1;
-          if (stat[0] == 1'b0) begin
+          // =========================
+          // BNE / BNR (INVERTED condition)
+          // =========================
+          BNE, BNR: begin
+            if (opcode == BNE)
+              br_sel = 1'b1;
+            else
+              br_sel = 1'b0;
+
+            if ((mm & stat) == 4'b0000) begin
+              pc_sel   = 1'b1;
+              pc_write = 1'b1;
+            end
+          end
+
+          // =========================
+          // Jumps / calls (always branch)
+          // =========================
+          JPA, JPR, CALL, RET: begin
+            if (opcode == JPA || opcode == CALL)
+              br_sel = 1'b1;
+            else
+              br_sel = 1'b0;
+
             pc_sel   = 1'b1;
             pc_write = 1'b1;
           end
-        end
 
-        // Relative conditional (NOT ZERO)
-        BNR: begin
-          br_sel = 1'b0;
-          if (stat[0] == 1'b0) begin
-            pc_sel   = 1'b1;
-            pc_write = 1'b1;
-          end
-        end
-
-      endcase
-    end
+        endcase
+      end
 
       execute,
       mem,
