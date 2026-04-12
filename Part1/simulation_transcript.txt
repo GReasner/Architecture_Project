@@ -84,4 +84,4 @@ ctrl.v:114: $stop called at 8900 (100ps)
 ** VVP Stop(0) **
 ** Flushing output streams.
 ** Current simulation time is 8900 ticks.
-[?2004h> 
+[?2004h> [?2004l
