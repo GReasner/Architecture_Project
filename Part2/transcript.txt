@@ -583,3 +583,5 @@ ctrl.v:193: $stop called at 27900 (100ps)
 ** VVP Stop(0) **
 ** Flushing output streams.
 ** Current simulation time is 27900 ticks.
+finish
+** Continue **
