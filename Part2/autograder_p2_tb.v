@@ -56,8 +56,8 @@ module sisc_p2_autograder_tb;
   reg checking_done;
   initial checking_done = 0;
 
-  always @(uut.IR.instr) begin
-    if (!checking_done && uut.IR.instr[31:28] == 4'hF && $time > 100) begin
+  always @(uut.u9.instr) begin
+    if (!checking_done && uut.u9.instr[31:28] == 4'hF && $time > 100) begin
       checking_done = 1;
       #1;
       run_all_checks;
@@ -97,22 +97,22 @@ module sisc_p2_autograder_tb;
       //   R3: 00000000    R6-R15: 00000000
 
       $display("  --- Register File ---");
-      check_val("R0",  uut.RF.ram_array[0],  32'h00000000);
-      check_val("R1",  uut.RF.ram_array[1],  32'h00000001);
-      check_val("R2",  uut.RF.ram_array[2],  32'h00000000);
-      check_val("R3",  uut.RF.ram_array[3],  32'h00000000);
-      check_val("R4",  uut.RF.ram_array[4],  32'h00000006);
-      check_val("R5",  uut.RF.ram_array[5],  32'hFF000019);
-      check_val("R6",  uut.RF.ram_array[6],  32'h00000000);
-      check_val("R7",  uut.RF.ram_array[7],  32'h00000000);
-      check_val("R8",  uut.RF.ram_array[8],  32'h00000000);
-      check_val("R9",  uut.RF.ram_array[9],  32'h00000000);
-      check_val("R10", uut.RF.ram_array[10], 32'h00000000);
-      check_val("R11", uut.RF.ram_array[11], 32'h00000000);
-      check_val("R12", uut.RF.ram_array[12], 32'h00000000);
-      check_val("R13", uut.RF.ram_array[13], 32'h00000000);
-      check_val("R14", uut.RF.ram_array[14], 32'h00000000);
-      check_val("R15", uut.RF.ram_array[15], 32'h00000000);
+      check_val("R0",  uut.u2.ram_array[0],  32'h00000000);
+      check_val("R1",  uut.u2.ram_array[1],  32'h00000001);
+      check_val("R2",  uut.u2.ram_array[2],  32'h00000000);
+      check_val("R3",  uut.u2.ram_array[3],  32'h00000000);
+      check_val("R4",  uut.u2.ram_array[4],  32'h00000006);
+      check_val("R5",  uut.u2.ram_array[5],  32'hFF000019);
+      check_val("R6",  uut.u2.ram_array[6],  32'h00000000);
+      check_val("R7",  uut.u2.ram_array[7],  32'h00000000);
+      check_val("R8",  uut.u2.ram_array[8],  32'h00000000);
+      check_val("R9",  uut.u2.ram_array[9],  32'h00000000);
+      check_val("R10", uut.u2.ram_array[10], 32'h00000000);
+      check_val("R11", uut.u2.ram_array[11], 32'h00000000);
+      check_val("R12", uut.u2.ram_array[12], 32'h00000000);
+      check_val("R13", uut.u2.ram_array[13], 32'h00000000);
+      check_val("R14", uut.u2.ram_array[14], 32'h00000000);
+      check_val("R15", uut.u2.ram_array[15], 32'h00000000);
 
       $display("");
       $display("============================================================");
@@ -127,26 +127,26 @@ module sisc_p2_autograder_tb;
       $display("");
       $display("  --- Diagnostic Hints ---");
 
-      if (uut.RF.ram_array[4] === 32'h7FFFFFFF && uut.RF.ram_array[2] === 32'hFFFFFFFF) begin
+      if (uut.u2.ram_array[4] === 32'h7FFFFFFF && uut.u2.ram_array[2] === 32'hFFFFFFFF) begin
         $display("  WARNING: R2/R4 still have Part 1 Section 2 values.");
         $display("    Part 1 works but branches (Part 2) are not executing.");
         $display("    Check: Does your PC advance past address 0x11?");
         $display("    Check: Are ir_load and pc_write set in the fetch state?");
       end
 
-      if (uut.RF.ram_array[4] === 32'h00000000 && uut.RF.ram_array[1] === 32'h00000001) begin
+      if (uut.u2.ram_array[4] === 32'h00000000 && uut.u2.ram_array[1] === 32'h00000001) begin
         $display("  WARNING: R4=0 after branch section. The inner loop");
         $display("    (L2 at 0x19-0x1B) may not be executing.");
         $display("    Check: BNR logic — branch taken when (CC & STAT) == 0.");
       end
 
-      if (uut.RF.ram_array[2] !== 32'h00000000 && uut.RF.ram_array[2] !== 32'hFFFFFFFF) begin
-        $display("  NOTE: R2 = %h (not 0 or FFFFFFFF).", uut.RF.ram_array[2]);
+      if (uut.u2.ram_array[2] !== 32'h00000000 && uut.u2.ram_array[2] !== 32'hFFFFFFFF) begin
+        $display("  NOTE: R2 = %h (not 0 or FFFFFFFF).", uut.u2.ram_array[2]);
         $display("    The outer loop (L1 at 0x16) may not be completing all iterations.");
         $display("    Check: BRR Z,+5 at 0x17 — should branch when Z=1 (R2 reached 0).");
       end
 
-      if (uut.RF.ram_array[4] > 32'h00000006) begin
+      if (uut.u2.ram_array[4] > 32'h00000006) begin
         $display("  WARNING: R4 > 6. The inner loop may be running too many times.");
         $display("    Check: BNE #0,L1 at 0x1C — unconditional branch to 0x16.");
         $display("    If BNE isn't working, the outer loop falls through to L3 early.");

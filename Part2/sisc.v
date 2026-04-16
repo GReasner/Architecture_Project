@@ -67,7 +67,7 @@ ctrl CTRL (
     br_sel, pc_rst, pc_write, pc_sel, ir_load
 );
 
-rf RF (clk, regA, regB, write_reg, write_data, rf_we, rsa, rsb);
+rf u2 (clk, regA, regB, write_reg, write_data, rf_we, rsa, rsb);
 
 alu ALU (clk, rsa, rsb, imm, stat_out[3], alu_op, mm, alu_result, stat, stat_en);
 
@@ -77,9 +77,9 @@ mux32 MUX (alu_result, 32'b0, wb_sel, write_data);
 
 im IM (pc_out, im_data);
 
-ir IR (clk, ir_load, im_data, instr);
+ir u9 (clk, ir_load, im_data, instr);
 
-pc PC (clk, br_addr, pc_sel, pc_write, pc_rst, pc_out);
+pc u10 (clk, br_addr, pc_sel, pc_write, pc_rst, pc_out);
 
 br BR (pc_out, imm, br_sel, br_addr);
 
@@ -94,9 +94,9 @@ initial begin
            write_reg,
            regA,
            regB,
-           RF.ram_array[1],
-           RF.ram_array[2],
-           RF.ram_array[3],
+           u2.ram_array[1],
+           u2.ram_array[2],
+           u2.ram_array[3],
            alu_result,
            stat_out,
            alu_op,
